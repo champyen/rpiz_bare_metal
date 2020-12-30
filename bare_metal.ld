@@ -6,11 +6,6 @@ SECTIONS {
 		*(.text)
 	}
 	. = ALIGN(4);
-	.rodata . : {
-		*(.rodata)
-		*(.rodata.*)
-	}
-	. = ALIGN(4);
 	.data . : {
 		*(.data)
 	}
@@ -19,8 +14,9 @@ SECTIONS {
 		*(.bss)
 		*(COMMON)
 	}
-	. = 0x8000 + 0x1fff;
-	.tail : {
-		*(.tail)
+	. = ALIGN(4);
+	.rodata . : {
+		*(.rodata)
+		*(.rodata.*)
 	}
 }
