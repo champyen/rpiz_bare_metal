@@ -3,6 +3,7 @@ SECTIONS {
 	. = 0x8000;
 
 	.text . : {
+		*(.text.entry)
 		*(.text)
 	}
 	. = ALIGN(4);
