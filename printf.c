@@ -34,11 +34,11 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#include "reg.h"
+
 #define PL011_BASE  0x20201000
 #define PL011_DR    (PL011_BASE + 0x00)
 #define PL011_FR    (PL011_BASE + 0x18)
-
-#define _REG(x)        *((unsigned int volatile *)(x))
 
 void _putc(unsigned char c)
 {

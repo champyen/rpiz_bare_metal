@@ -16,40 +16,46 @@ swi_target:             .word   syscall_entry
 prefetch_target:        .word   prefetch_entry
 abort_target:           .word   abort_entry
 unused_target:          .word   unused_entry
-irq_target:             .word   interrupt_entry
+irq_target:             .word   irq_entry
 fiq_target:             .word   fiq_entry
 
+
 reset_entry:
+    /* set VBAR to 0x8000 */
+    mov r0, #0x8000
+    mcr p15, 0, r0, c12, c0, 0
+
     /* (PSR_FIQ_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xD1
     msr cpsr_c,r0
-    ldr sp,=stack_fiq_top
+    ldr sp, stack_fiq_top
 
     /* (PSR_IRQ_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xD2
     msr cpsr_c,r0
-    ldr sp,=stack_irq_top
+    ldr sp, stack_irq_top
 
     /* (PSR_ABT_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xD7
     msr cpsr_c,r0
-    ldr sp,=stack_fiq_top
+    ldr sp, stack_abt_top
 
     /* (PSR_UND_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xDb
     msr cpsr_c,r0
-    ldr sp,=stack_und_top
+    ldr sp, stack_und_top
 
     /* (PSR_SYS_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xDf
     msr cpsr_c,r0
-    ldr sp,=stack_sys_top
+    ldr sp, stack_sys_top
 
     /* (PSR_SVC_MODE|PSR_FIQ_DIS|PSR_IRQ_DIS) */
     mov r0,#0xD3
     msr cpsr_c,r0
-    ldr sp, =stack_svc_top
+    ldr sp, stack_svc_top
 
+    cpsie i
     bl  bare_metal_start
 
 undefined_entry:
@@ -67,11 +73,19 @@ abort_entry:
 unused_entry:
     b reset_entry
 
-interrupt_entry:
-    b reset_entry
-
 fiq_entry:
     b reset_entry
+
+irq_entry:
+    stmfd  sp!, {r0-r12, lr}
+
+    add     lr, pc, #4
+    bl      isr_entry
+
+    ldmfd   sp!, {r0-r12, lr}
+
+    subs    pc, lr, #4
+
 
 stack_svc_top:      .word   0x100000
 stack_fiq_top:      .word   0x110000

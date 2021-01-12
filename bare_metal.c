@@ -1,9 +1,21 @@
-
-void printf(const char *fmt, ...);
+#include "printf.h"
+#include "isr.h"
 
 void bare_metal_start(void)
 {
-    printf("\n\n%s: Hello World! %s %s %d\n\n", __func__, __DATE__, __TIME__, __LINE__);
+    int base = 0;
+    asm volatile (
+        "mov %0, sp\n\t" : "=r" (base)
+    );
+
+    printf("\n\n%s:%x: Hello World! %s %s %d\n\n", __func__, base, __DATE__, __TIME__, __LINE__);
     printf("enter busy loop\n");
-    while(1);
+
+    timer_enable(1);
+
+    volatile int i = 0;
+    while(1){
+        if((i++ & 0x00FFFFFF) == 0)
+            printf("%d\n", i);
+    }
 }
