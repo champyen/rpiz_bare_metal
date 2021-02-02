@@ -15,7 +15,7 @@ bare_metal.elf: head.o bare_metal.o printf.o isr.o
 	$(LD) $^ -T bare_metal.ld -o $@
 
 head.o: head.S
-	$(AS) $(ARCH_FLAGS) -c $^
+	$(AS) $(ARCH_FLAGS) -o $@ $^
 
 printf.o: printf.c
 	$(CC) $(ARCH_FLAGS) -c $^
