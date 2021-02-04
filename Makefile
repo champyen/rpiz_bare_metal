@@ -7,6 +7,7 @@ OBJCOPY=arm-none-eabi-objcopy
 #OBJCOPY=llvm-objcopy-11
 
 ARCH_FLAGS=-march=armv6
+CFLAGS=-Wno-builtin-declaration-mismatch
 
 bare_metal.bin: bare_metal.elf
 	$(OBJCOPY) -O binary $^ $@
@@ -17,17 +18,8 @@ bare_metal.elf: head.o bare_metal.o printf.o isr.o syscall.o
 head.o: head.S
 	$(AS) $(ARCH_FLAGS) -o $@ $^
 
-printf.o: printf.c
-	$(CC) $(ARCH_FLAGS) -c $^
-
-bare_metal.o: bare_metal.c
-	$(CC) $(ARCH_FLAGS) -c $^
-
-isr.o: isr.c
-	$(CC) $(ARCH_FLAGS) -c $^
-
-syscall.o: syscall.c
-	$(CC) $(ARCH_FLAGS) -c $^
+.c.o:
+	$(CC) $(ARCH_FLAGS) $(CFLAGS) -c $^
 
 clean:
 	rm -f *.o *.elf *.bin
