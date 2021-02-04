@@ -12,7 +12,7 @@ _start:
 
 reset_target:           .word   reset_entry
 undefined_target:       .word   undefined_entry
-swi_target:             .word   syscall_entry
+swi_target:             .word   swi_entry
 prefetch_target:        .word   prefetch_entry
 abort_target:           .word   abort_entry
 unused_target:          .word   unused_entry
@@ -61,8 +61,16 @@ reset_entry:
 undefined_entry:
     b reset_entry
 
-syscall_entry:
-    b reset_entry
+swi_entry:
+    stmfd  sp!, {r0-r12, lr}
+
+    ldr     r0, [lr,#-4]
+    bic     r0, r0, #0xff000000
+    add     lr, pc, #4
+    bl      syscall_entry
+
+    ldmfd   sp!, {r0-r12, lr}
+    movs    pc, lr
 
 prefetch_entry:
     b reset_entry

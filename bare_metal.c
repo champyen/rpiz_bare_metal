@@ -15,7 +15,9 @@ void bare_metal_start(void)
 
     volatile int i = 0;
     while(1){
-        if((i++ & 0x00FFFFFF) == 0)
+        if((i++ & 0x00FFFFFF) == 0){
             printf("%d\n", i);
+            asm volatile ("swi #0xFF");
+        }
     }
 }
